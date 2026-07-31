@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@andbeetroot11rew/repocanvas": "*",
+    "@beetroot11/repocanvas": "*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   }
