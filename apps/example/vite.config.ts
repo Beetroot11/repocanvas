@@ -8,7 +8,7 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
     alias: [
       {
-        find: '@andrew/repocanvas',
+        find: '@beetroot11/repocanvas',
         replacement: fileURLToPath(new URL('../../packages/repocanvas/src/index.ts', import.meta.url)),
       },
     ],

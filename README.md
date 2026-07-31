@@ -2,12 +2,12 @@
 
 RepoCanvas is a reusable React and TypeScript package for keeping visual project context inside the project where it belongs. It provides a whiteboard library and an effectively endless Excalidraw-powered canvas, while leaving authentication and persistence to the host application.
 
-The package is named `@andrew/repocanvas`.
+The package is named `@beetroot11/repocanvas`.
 
 Add it to an existing React application with one command—the editor, visual assets, and styles are bundled with it, with no separate CSS import:
 
 ```bash
-npm install @andrew/repocanvas
+npm install @beetroot11/repocanvas
 ```
 
 ## What is implemented

@@ -19,7 +19,7 @@
   "scripts": {
     "dev": "npm run dev --workspace=@repocanvas/example",
     "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspace=@andrew/repocanvas",
+    "test": "npm run test --workspace=@beetroot11/repocanvas",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "devDependencies": {

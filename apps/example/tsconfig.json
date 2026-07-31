@@ -16,7 +16,7 @@
     "types": ["vite/client", "node"],
     "baseUrl": ".",
     "paths": {
-      "@andrew/repocanvas": ["../../packages/repocanvas/src/index.ts"]
+      "@beetroot11/repocanvas": ["../../packages/repocanvas/src/index.ts"]
     }
   },
   "include": ["src", "vite.config.ts"]

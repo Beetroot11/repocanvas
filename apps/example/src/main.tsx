@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import {
   LocalStorageWhiteboardStorageAdapter,
   WhiteboardWorkspace,
-} from '@andrew/repocanvas'
+} from '@beetroot11/repocanvas'
 import './example.css'
 
 const storage = new LocalStorageWhiteboardStorageAdapter('repocanvas:example:v3')

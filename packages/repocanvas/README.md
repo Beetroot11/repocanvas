@@ -1,11 +1,11 @@
-# `@andrew/repocanvas`
+# `@beetroot11/repocanvas`
 
 A private visual notebook for every project, packaged as reusable React components.
 
 ## Install
 
 ```bash
-npm install @andrew/repocanvas
+npm install @beetroot11/repocanvas
 ```
 
 That is the only RepoCanvas package an existing React application needs. The editor, icons, fonts, styles, and their runtime code ship inside RepoCanvas; React 18.2+ or React 19 remains a peer so the host and canvas share one React instance. Excalidraw is MIT-licensed and does not require a production key.
@@ -18,16 +18,18 @@ There is no separate stylesheet import. RepoCanvas injects its compiled styles o
 import {
   LocalStorageWhiteboardStorageAdapter,
   WhiteboardWorkspace,
-} from '@andrew/repocanvas'
+} from "@beetroot11/repocanvas";
 
-const storage = new LocalStorageWhiteboardStorageAdapter('my-project:whiteboards')
+const storage = new LocalStorageWhiteboardStorageAdapter(
+  "my-project:whiteboards",
+);
 
 export function WhiteboardsPage() {
   return (
-    <main style={{ height: '100dvh' }}>
+    <main style={{ height: "100dvh" }}>
       <WhiteboardWorkspace storage={storage} />
     </main>
-  )
+  );
 }
 ```
 
@@ -38,14 +40,14 @@ The local-storage adapter is intended for demonstrations and personal browser-lo
 Use `WhiteboardSurface` when the host needs only the whiteboard—no library, board index, workspace frame, RepoCanvas masthead, or title bar:
 
 ```tsx
-import { WhiteboardSurface } from '@andrew/repocanvas'
+import { WhiteboardSurface } from "@beetroot11/repocanvas";
 
 export function EmbeddedDiagram({ storage, id }: Props) {
   return (
     <div style={{ height: 640 }}>
       <WhiteboardSurface whiteboardId={id} storage={storage} />
     </div>
-  )
+  );
 }
 ```
 
@@ -67,26 +69,36 @@ import {
   WhiteboardCanvas,
   WhiteboardLibrary,
   type WhiteboardStorageAdapter,
-} from '@andrew/repocanvas'
+} from "@beetroot11/repocanvas";
 
-export function LibraryRoute({ storage }: { storage: WhiteboardStorageAdapter }) {
+export function LibraryRoute({
+  storage,
+}: {
+  storage: WhiteboardStorageAdapter;
+}) {
   return (
     <WhiteboardLibrary
       storage={storage}
       onOpen={(id) => navigate(`/whiteboards/${id}`)}
     />
-  )
+  );
 }
 
-export function CanvasRoute({ storage, id }: { storage: WhiteboardStorageAdapter; id: string }) {
+export function CanvasRoute({
+  storage,
+  id,
+}: {
+  storage: WhiteboardStorageAdapter;
+  id: string;
+}) {
   return (
     <WhiteboardCanvas
       storage={storage}
       whiteboardId={id}
-      onBack={() => navigate('/whiteboards')}
+      onBack={() => navigate("/whiteboards")}
       onRecoveredCopy={(copyId) => navigate(`/whiteboards/${copyId}`)}
     />
-  )
+  );
 }
 ```
 
@@ -96,14 +108,14 @@ export function CanvasRoute({ storage, id }: { storage: WhiteboardStorageAdapter
 
 ```ts
 interface WhiteboardStorageAdapter {
-  list(): Promise<WhiteboardSummary[]>
-  create(input: { title: string }): Promise<Whiteboard>
-  load(id: string): Promise<Whiteboard>
-  save(input: SaveWhiteboardInput): Promise<Whiteboard>
-  rename(id: string, title: string): Promise<WhiteboardSummary>
-  duplicate(id: string, title?: string): Promise<Whiteboard>
-  archive(id: string): Promise<void>
-  restore(id: string): Promise<void>
+  list(): Promise<WhiteboardSummary[]>;
+  create(input: { title: string }): Promise<Whiteboard>;
+  load(id: string): Promise<Whiteboard>;
+  save(input: SaveWhiteboardInput): Promise<Whiteboard>;
+  rename(id: string, title: string): Promise<WhiteboardSummary>;
+  duplicate(id: string, title?: string): Promise<Whiteboard>;
+  archive(id: string): Promise<void>;
+  restore(id: string): Promise<void>;
 }
 ```
 
@@ -113,10 +125,10 @@ RepoCanvas stores the durable Excalidraw scene in its public envelope:
 
 ```ts
 interface RepoCanvasDocument {
-  formatVersion: 2
-  engine: 'excalidraw'
-  engineVersion?: string
-  snapshot: unknown
+  formatVersion: 2;
+  engine: "excalidraw";
+  engineVersion?: string;
+  snapshot: unknown;
 }
 ```
 
