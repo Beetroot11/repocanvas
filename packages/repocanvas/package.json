@@ -1,0 +1,39 @@
+{
+  "name": "@andrew/repocanvas",
+  "version": "0.1.0",
+  "description": "A private visual notebook for every project.",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "prepack": "npm run build && npm run verify:package",
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "verify:package": "node ./scripts/verify-build.mjs"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
+    "@fontsource/barlow-condensed": "latest",
+    "@phosphor-icons/react": "latest",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "vite-plugin-css-injected-by-js": "^5.0.2"
+  }
+}

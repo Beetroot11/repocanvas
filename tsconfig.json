@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/repocanvas/tsconfig.json" },
+    { "path": "./apps/example/tsconfig.json" }
+  ]
+}
+

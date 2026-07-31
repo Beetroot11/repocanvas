@@ -1,0 +1,36 @@
+{
+  "name": "repocanvas-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "overrides": {
+    "lodash-es": "4.18.1",
+    "@excalidraw/excalidraw": {
+      "nanoid": "3.3.16"
+    },
+    "@excalidraw/mermaid-to-excalidraw": {
+      "nanoid": "5.1.16"
+    }
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=@repocanvas/example",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspace=@andrew/repocanvas",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/node": "^24.10.1",
+    "@vitejs/plugin-react": "latest",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.0",
+    "vitest": "latest"
+  }
+}
