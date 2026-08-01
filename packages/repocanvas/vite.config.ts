@@ -13,6 +13,7 @@ export default defineConfig({
       useStrictCSP: true,
     }),
   ],
+
   build: {
     lib: {
       entry: 'src/index.ts',
@@ -20,12 +21,15 @@ export default defineConfig({
       fileName: 'index',
       cssFileName: 'repocanvas',
     },
+
     rollupOptions: {
       external: (id) =>
         id === 'react' ||
         id.startsWith('react/') ||
         id === 'react-dom' ||
-        id.startsWith('react-dom/'),
+        id.startsWith('react-dom/') ||
+        id === '@excalidraw/excalidraw' ||
+        id.startsWith('@excalidraw/excalidraw/'),
     },
   },
 })
