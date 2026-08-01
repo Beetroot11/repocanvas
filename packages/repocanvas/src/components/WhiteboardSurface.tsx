@@ -1,18 +1,22 @@
-import { WhiteboardCanvas, type WhiteboardCanvasProps } from './WhiteboardCanvas'
+import { forwardRef } from 'react'
+import {
+  WhiteboardCanvas,
+  type WhiteboardCanvasHandle,
+  type WhiteboardCanvasProps,
+} from './WhiteboardCanvas'
 
 export interface WhiteboardSurfaceProps extends Omit<WhiteboardCanvasProps, 'chrome' | 'embedded'> {
   /**
-   * `minimal` keeps the canvas tools, zoom, fullscreen, and recovery UI.
-   * `none` renders only the engine surface for hosts that provide all controls.
+   * `minimal` keeps canvas tools, zoom, fullscreen, save recovery, and connector locks.
+   * `none` renders only the engine surface; use the forwarded handle for host controls.
    */
   chrome?: 'minimal' | 'none'
 }
 
-/**
- * A first-class canvas-only embed. It omits the library, workspace frame, board
- * index, RepoCanvas masthead, and title bar while retaining the same storage,
- * autosave, recovery, Pencil policy, and connector bindings.
- */
-export function WhiteboardSurface({ chrome = 'minimal', ...props }: WhiteboardSurfaceProps) {
-  return <WhiteboardCanvas {...props} chrome={chrome} embedded />
-}
+export const WhiteboardSurface = forwardRef<WhiteboardCanvasHandle, WhiteboardSurfaceProps>(
+  function WhiteboardSurface({ chrome = 'minimal', ...props }, ref) {
+    return <WhiteboardCanvas ref={ref} {...props} chrome={chrome} embedded />
+  },
+)
+
+WhiteboardSurface.displayName = 'WhiteboardSurface'

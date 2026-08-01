@@ -9,16 +9,23 @@ export default defineConfig({
       attributes: {
         'data-repocanvas-styles': 'true',
       },
-      jsAssetsFilterFunction: (chunk) => chunk.isEntry,
+      jsAssetsFilterFunction: (chunk) =>
+        chunk.isEntry && ['index', 'editor', 'library'].includes(chunk.name),
       useStrictCSP: true,
     }),
   ],
 
   build: {
     lib: {
-      entry: 'src/index.ts',
+      entry: {
+        index: 'src/index.ts',
+        core: 'src/core.ts',
+        editor: 'src/editor.ts',
+        library: 'src/library.ts',
+        testing: 'src/testing.ts',
+      },
       formats: ['es'],
-      fileName: 'index',
+      fileName: (_format, entryName) => `${entryName}.js`,
       cssFileName: 'repocanvas',
     },
 

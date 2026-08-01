@@ -1,170 +1,183 @@
 # `@beetroot11/repocanvas`
 
-A private visual notebook for every project, packaged as reusable React components.
+A reusable React whiteboard with controlled, persistence-aware, and complete-library integration levels.
 
-## Install
+## Install and compatibility
 
 ```bash
 npm install @beetroot11/repocanvas
 ```
 
-That is the only RepoCanvas package an existing React application needs. The editor, icons, fonts, styles, and their runtime code ship inside RepoCanvas; React 18.2+ or React 19 remains a peer so the host and canvas share one React instance. Excalidraw is MIT-licensed and does not require a production key.
+| Dependency | Supported |
+| --- | --- |
+| React / React DOM | 18.2+ and 19 |
+| Excalidraw | `^0.18.1` |
+| TypeScript | Declarations included |
+| Rendering | Modern evergreen browsers |
+| Server import | Safe; the editor still renders on the client |
 
-There is no separate stylesheet import. RepoCanvas injects its compiled styles once when the package loads. In a strict Content Security Policy host, provide the page's nonce through `<meta property="csp-nonce" content="…" />`.
+Styled entry points inject their compiled styles once, including Excalidraw styles and the bundled font. A strict CSP host can provide `<meta property="csp-nonce" content="…" />`. The `core` and `testing` subpaths do not inject styles or import React.
 
-## Smallest integration
+## Controlled editor
+
+Use the controlled editor when your application already owns the document and save lifecycle:
 
 ```tsx
+import { useRef, useState } from 'react'
 import {
-  LocalStorageWhiteboardStorageAdapter,
-  WhiteboardWorkspace,
-} from "@beetroot11/repocanvas";
+  RepoCanvasEditor,
+  type RepoCanvasDocument,
+  type RepoCanvasEditorHandle,
+} from '@beetroot11/repocanvas/editor'
+import { createEmptyDocument } from '@beetroot11/repocanvas/core'
 
-const storage = new LocalStorageWhiteboardStorageAdapter(
-  "my-project:whiteboards",
-);
+export function DiagramField() {
+  const [document, setDocument] = useState<RepoCanvasDocument>(createEmptyDocument())
+  const editor = useRef<RepoCanvasEditorHandle>(null)
 
-export function WhiteboardsPage() {
-  return (
-    <main style={{ height: "100dvh" }}>
-      <WhiteboardWorkspace storage={storage} />
-    </main>
-  );
-}
-```
-
-The local-storage adapter is intended for demonstrations and personal browser-local use. Production hosts should implement `WhiteboardStorageAdapter` over their own authenticated application API.
-
-## Canvas-only embed
-
-Use `WhiteboardSurface` when the host needs only the whiteboard—no library, board index, workspace frame, RepoCanvas masthead, or title bar:
-
-```tsx
-import { WhiteboardSurface } from "@beetroot11/repocanvas";
-
-export function EmbeddedDiagram({ storage, id }: Props) {
   return (
     <div style={{ height: 640 }}>
-      <WhiteboardSurface whiteboardId={id} storage={storage} />
+      <RepoCanvasEditor
+        ref={editor}
+        document={document}
+        onChange={setDocument}
+        theme="system"
+        tools={{ image: true }}
+      />
     </div>
-  );
+  )
 }
 ```
 
-The default `minimal` mode keeps the floating tool, zoom, fullscreen, save-recovery, and connector-lock UI. Pass `chrome="none"` when the host supplies every control itself. Autosave, save-status callbacks, recovery, Pencil/touch policy, and bindings continue to run in both modes:
+Set `readOnly`, `locale`, `grid`, `pencilMode`, `className`, `style`, or `renderTopRightUI` as needed. Change `documentKey` to intentionally reset the editor scene and undo history.
+
+The handle exposes document capture/replacement, focus, zoom-to-fit, tool selection, fullscreen, PNG/SVG/JSON export, clipboard export, thumbnail generation, and resource attachment.
+
+## Persistence-aware canvas
 
 ```tsx
+import { useRef } from 'react'
+import {
+  WhiteboardSurface,
+  type WhiteboardCanvasHandle,
+} from '@beetroot11/repocanvas/editor'
+
+const canvas = useRef<WhiteboardCanvasHandle>(null)
+
 <WhiteboardSurface
+  ref={canvas}
   whiteboardId={id}
   storage={storage}
   chrome="none"
-  onSaveStatusChange={(status) => hostToolbar.setSaveStatus(status)}
+  onSaveStatusDetailChange={(detail) => hostToolbar.setSaveState(detail)}
 />
+
+// Host-provided controls remain possible with zero package chrome.
+await canvas.current?.save()
+await canvas.current?.download('svg')
+await canvas.current?.saveAsCopy()
 ```
 
-## Route-controlled integration
+Autosave uses a one-second debounce by default, serializes writes, flushes before internal back navigation, ignores stale board requests, and retries ordinary failures with capped exponential backoff. Offline and conflict states retain the current editor. A LocalStorage-plus-IndexedDB recovery journal restores dirty work after an interrupted browser session.
+
+## Complete workspace
 
 ```tsx
 import {
-  WhiteboardCanvas,
-  WhiteboardLibrary,
-  type WhiteboardStorageAdapter,
-} from "@beetroot11/repocanvas";
+  IndexedDbWhiteboardStorageAdapter,
+  WhiteboardWorkspace,
+} from '@beetroot11/repocanvas'
 
-export function LibraryRoute({
-  storage,
-}: {
-  storage: WhiteboardStorageAdapter;
-}) {
-  return (
-    <WhiteboardLibrary
-      storage={storage}
-      onOpen={(id) => navigate(`/whiteboards/${id}`)}
-    />
-  );
-}
+const storage = new IndexedDbWhiteboardStorageAdapter({ databaseName: 'my-product-whiteboards' })
 
-export function CanvasRoute({
-  storage,
-  id,
-}: {
-  storage: WhiteboardStorageAdapter;
-  id: string;
-}) {
-  return (
-    <WhiteboardCanvas
-      storage={storage}
-      whiteboardId={id}
-      onBack={() => navigate("/whiteboards")}
-      onRecoveredCopy={(copyId) => navigate(`/whiteboards/${copyId}`)}
-    />
-  );
-}
+<WhiteboardWorkspace
+  storage={storage}
+  libraryTitle="Project diagrams"
+  libraryProps={{ productName: 'My Product', projectId, logo: <MyLogo /> }}
+  canvasProps={{ theme: 'system', tools: { image: true } }}
+/>
 ```
 
-`RepoCanvasProvider` can provide `storage` when several descendants use the package.
+The board list is collapsible by button or `Ctrl/⌘+Shift+L`. Configure `initialLibraryCollapsed`, `persistLayoutKey`, `showLibraryToggle`, or `onLibraryCollapsedChange` to integrate it with the host layout.
 
-## Storage contract
+The library supports title/tag search, tag filters, real thumbnails, templates, project scoping, archives, and an accessible mobile overflow menu.
+
+## Storage adapters
+
+- `InMemoryWhiteboardStorageAdapter`: tests, previews, and ephemeral sessions
+- `LocalStorageWhiteboardStorageAdapter`: small personal browser-local libraries with cross-tab refresh
+- `IndexedDbWhiteboardStorageAdapter`: larger browser-local libraries and embedded images
+- `FetchWhiteboardStorageAdapter`: authenticated host API integration
+
+Production hosts can implement `WhiteboardStorageAdapter`. Optimistic operations receive an expected revision and should throw `RevisionConflictError` for stale writes. Optional `updateMetadata`, `remove`, `subscribe`, and `listPage` capabilities progressively enhance the library.
+
+Validate an implementation without coupling to a test framework:
 
 ```ts
-interface WhiteboardStorageAdapter {
-  list(): Promise<WhiteboardSummary[]>;
-  create(input: { title: string }): Promise<Whiteboard>;
-  load(id: string): Promise<Whiteboard>;
-  save(input: SaveWhiteboardInput): Promise<Whiteboard>;
-  rename(id: string, title: string): Promise<WhiteboardSummary>;
-  duplicate(id: string, title?: string): Promise<Whiteboard>;
-  archive(id: string): Promise<void>;
-  restore(id: string): Promise<void>;
-}
+import { verifyWhiteboardStorageAdapter } from '@beetroot11/repocanvas/testing'
+
+await verifyWhiteboardStorageAdapter(() => new MyStorageAdapter(testApi))
 ```
 
-`save` receives an `expectedRevision`. The host must reject stale writes, ideally by throwing `RevisionConflictError`. RepoCanvas will stop autosaving, retain the local canvas, and offer **Save as copy** and **Export recovery**.
+See the repository’s `docs/HTTP-ADAPTER.md` for the fetch contract.
 
-RepoCanvas stores the durable Excalidraw scene in its public envelope:
+## Documents, imports, and source control
 
 ```ts
 interface RepoCanvasDocument {
-  formatVersion: 2;
-  engine: "excalidraw";
-  engineVersion?: string;
-  snapshot: unknown;
+  formatVersion: 2
+  engine: 'excalidraw'
+  engineVersion?: string
+  snapshot: unknown
+  metadata?: {
+    templateId?: string
+    resources?: Record<string, RepoCanvasResource>
+  }
 }
 ```
 
-The snapshot includes elements, files, and restorable canvas view state while keeping engine-specific types out of the public API.
+`migrateDocument` accepts RepoCanvas v1, v2, and ordinary Excalidraw JSON. `serializeRepoCanvasDocument` sorts object keys while preserving arrays, producing deterministic JSON suitable for fixtures and source control.
 
-## Autosave and recovery
+Use `createDocumentFromMermaid`, `createDocumentFromMarkdown`, or `createDocumentFromCode` to turn developer-friendly text into an editable canvas. The persistence-aware canvas also recognizes `.mmd`, `.md`, common source-code extensions, RepoCanvas JSON, and Excalidraw JSON from its import control.
 
-- Document changes are debounced for 1 second by default.
-- Saves are serialized so an older request cannot overwrite a newer request.
-- Scene and restorable view changes are coalesced into the same debounced save.
-- A pending save is flushed when the page becomes hidden when the platform permits.
-- Offline, failed, and revision-conflict states keep the live editor intact.
-- Failed work can be retried or exported as a RepoCanvas JSON recovery file.
-- A conflict can be written into a newly created recovered board.
+```bash
+npx repocanvas validate diagram.json
+npx repocanvas upgrade old.json upgraded.json
+npx repocanvas format diagram.json
+npx repocanvas render diagram.json diagram.svg
+```
 
-## Input policy
+## Templates and developer resources
 
-- Pencil pointers switch to natural freehand drawing.
-- Touch pointers are prevented from drawing when the pen tool is active.
-- Mouse users choose tools explicitly.
-- Excalidraw's keyboard shortcuts remain available for its drawing tools.
-- Dragging an arrow endpoint over a bindable shape shows its target highlight and four edge lock points. Dropping creates a durable binding, so the connector follows the shape when it moves.
+The default library includes system architecture, data-flow, architecture-decision, and incident-timeline templates. Pass your own `RepoCanvasTemplate[]` to `WhiteboardLibrary`.
 
-Touch/Pencil concurrency is partly controlled by browser and engine pointer handling. Do not treat it as production-proven until the physical Safari checklist in the repository has passed.
+Attach a file, symbol, commit, issue, route, or URL to selected shapes using the editor handle. `onResourceOpen` keeps navigation host-owned, allowing integrations with IDE routes, GitHub, issue trackers, or internal applications without coupling RepoCanvas to them.
 
-## Editor licence
+## Styling
 
-RepoCanvas uses the MIT-licensed Excalidraw editor package. There is no RepoCanvas editor licence prop, runtime key, production watermark requirement, or paid deployment gate.
+Use `className`/`style` and override the documented variables on the component itself:
 
-## Public exports
+```tsx
+<RepoCanvasEditor
+  style={{
+    '--rc-orange': '#8b5cf6',
+    '--rc-blue': '#06b6d4',
+    '--rc-field': '#f8fafc',
+  } as React.CSSProperties}
+  document={document}
+/>
+```
 
-- `WhiteboardWorkspace`
-- `WhiteboardLibrary`
-- `WhiteboardCanvas`
-- `WhiteboardSurface`
-- `RepoCanvasProvider`
-- `InMemoryWhiteboardStorageAdapter`
-- `LocalStorageWhiteboardStorageAdapter`
-- RepoCanvas document, whiteboard, save, error, and storage types
+Stable variables include `--rc-ink`, `--rc-ink-soft`, `--rc-panel`, `--rc-panel-raised`, `--rc-paper`, `--rc-field`, `--rc-field-deep`, `--rc-rule`, `--rc-orange`, `--rc-blue`, `--rc-green`, `--rc-red`, and `--rc-radius`.
+
+## Entry points
+
+- `@beetroot11/repocanvas`: complete API with styles
+- `@beetroot11/repocanvas/core`: documents and adapters, no React or styles
+- `@beetroot11/repocanvas/editor`: editor/canvas components with styles
+- `@beetroot11/repocanvas/library`: provider/library/workspace with styles and a lazy canvas
+- `@beetroot11/repocanvas/testing`: adapter contract verifier, no React or styles
+
+## Input status
+
+Pencil selects freehand drawing, touch exits freehand so fingers manipulate the view, and mouse users select tools normally. Simultaneous Pencil and touch depends on Safari and Excalidraw pointer handling; complete the repository’s physical-device checklist before treating it as production-proven.

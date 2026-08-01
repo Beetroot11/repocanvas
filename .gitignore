@@ -4,3 +4,7 @@ coverage/
 .DS_Store
 *.tsbuildinfo
 .impeccable/
+playwright-report/
+test-results/
+.repocanvas-consumer-*/
+*.tgz

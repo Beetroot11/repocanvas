@@ -1,7 +1,7 @@
 @import '@fontsource/barlow-condensed/latin-600.css';
 @import '@excalidraw/excalidraw/index.css';
 
-:where(.rc-library, .rc-canvas, .rc-canvas-state, .rc-workspace) {
+:where(.rc-library, .rc-canvas, .rc-editor, .rc-canvas-state, .rc-workspace, .rc-dialog-layer) {
   --rc-ink: #132631;
   --rc-ink-soft: #415765;
   --rc-panel: #172832;
@@ -24,24 +24,89 @@
   box-sizing: border-box;
 }
 
-:where(.rc-library, .rc-library *, .rc-canvas, .rc-canvas *, .rc-canvas-state, .rc-canvas-state *, .rc-workspace, .rc-workspace *) {
+:where(.rc-library, .rc-library *, .rc-canvas, .rc-canvas *, .rc-editor, .rc-editor *, .rc-canvas-state, .rc-canvas-state *, .rc-workspace, .rc-workspace *, .rc-dialog-layer, .rc-dialog-layer *) {
   box-sizing: border-box;
 }
 
-:where(.rc-library, .rc-canvas) button,
-:where(.rc-library, .rc-canvas) input {
+:where(.rc-library, .rc-canvas, .rc-editor, .rc-dialog-layer) button,
+:where(.rc-library, .rc-canvas, .rc-editor, .rc-dialog-layer) input {
   font: inherit;
 }
 
-:where(.rc-library, .rc-canvas) button {
+:where(.rc-library, .rc-canvas, .rc-editor, .rc-dialog-layer) button {
   color: inherit;
 }
 
-:where(.rc-library, .rc-canvas) button:focus-visible,
-:where(.rc-library, .rc-canvas) input:focus-visible {
+:where(.rc-library, .rc-canvas, .rc-editor, .rc-dialog-layer) button:focus-visible,
+:where(.rc-library, .rc-canvas, .rc-editor, .rc-dialog-layer) input:focus-visible {
   outline: 3px solid #f28c45;
   outline-offset: 2px;
 }
+
+.rc-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+}
+
+.rc-dialog-layer {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(19, 38, 49, .56);
+  backdrop-filter: blur(3px);
+}
+
+.rc-dialog {
+  width: min(460px, 100%);
+  overflow: hidden;
+  border: 1px solid #8fa2ad;
+  border-radius: 13px;
+  background: var(--rc-paper);
+  box-shadow: 0 24px 70px rgba(19, 38, 49, .34);
+}
+
+.rc-dialog__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--rc-rule);
+  padding: 16px 18px;
+}
+.rc-dialog__header h2 { margin: 0; font-family: "Barlow Condensed", ui-sans-serif, sans-serif; font-size: 24px; }
+.rc-dialog__header p { overflow: hidden; margin: 1px 0 0; color: var(--rc-ink-soft); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.rc-dialog__symbol { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 9px; background: #e6eef2; color: var(--rc-orange-dark); }
+.rc-dialog__close { display: grid; width: 34px; height: 34px; place-items: center; border: 0; border-radius: 8px; background: transparent; cursor: pointer; }
+.rc-dialog__close:hover { background: #e4ecef; }
+.rc-dialog form { padding: 18px; }
+.rc-dialog form > label { display: block; margin-bottom: 7px; font-size: 12px; font-weight: 700; }
+.rc-dialog__hint { margin: 7px 0 0; color: var(--rc-ink-soft); font-size: 11px; }
+.rc-dialog__error { margin: 10px 0 0; color: var(--rc-red); font-size: 12px; font-weight: 700; }
+.rc-dialog__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+.rc-tag-editor__field {
+  display: flex;
+  min-height: 48px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--rc-rule);
+  border-radius: 9px;
+  padding: 7px;
+  background: white;
+  cursor: text;
+}
+.rc-tag-editor__field:focus-within { border-color: var(--rc-orange); box-shadow: 0 0 0 3px rgba(217, 101, 24, .14); }
+.rc-tag-editor__field input { min-width: 130px; flex: 1; border: 0; outline: 0; padding: 5px 4px; background: transparent; }
+.rc-tag-chip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #9eb4bf; border-radius: 999px; padding: 5px 8px; background: #e7f0f4; color: var(--rc-ink); font-size: 12px; cursor: pointer; }
+.rc-tag-chip:hover { border-color: var(--rc-orange); background: #fff2e9; }
 
 .rc-logo {
   position: relative;
@@ -212,6 +277,28 @@
 .rc-library__heading-row h1 { margin: 0 0 5px; font-family: "Barlow Condensed", ui-sans-serif, sans-serif; font-size: clamp(25px, 2vw, 34px); font-weight: 600; line-height: 1.08; letter-spacing: -.02em; }
 .rc-library__heading-row p { max-width: 40ch; margin: 0; color: #aabdc6; font-size: 13px; }
 
+.rc-library__filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--rc-rule-dark);
+  background: #13242d;
+}
+.rc-library__filters label { display: flex; min-width: 0; flex: 1; align-items: center; gap: 8px; color: #91a6af; }
+.rc-library__filters input,
+.rc-library__filters select,
+.rc-create-board select {
+  min-width: 0;
+  border: 1px solid #4b6571;
+  border-radius: 7px;
+  padding: 7px 9px;
+  background: #1d303b;
+  color: #eef5f7;
+}
+.rc-library__filters input { width: 100%; border: 0; padding-inline: 0; background: transparent; }
+.rc-library__filters input::placeholder { color: #78909b; }
+
 .rc-segmented-toggle {
   display: inline-flex;
   min-height: 34px;
@@ -290,6 +377,12 @@
 .rc-board-row:focus-within .rc-board-row__actions { opacity: 1; }
 .rc-board-row__actions button { display: grid; width: 32px; height: 32px; place-items: center; border: 0; border-radius: 7px; background: transparent; color: #a9bdc5; cursor: pointer; }
 .rc-board-row__actions button:hover { background: #304752; color: white; }
+.rc-board-row__overflow { display: none; position: relative; }
+.rc-board-row__overflow summary { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 7px; cursor: pointer; list-style: none; }
+.rc-board-row__overflow summary::-webkit-details-marker { display: none; }
+.rc-board-row__overflow[open] summary { background: #304752; color: white; }
+.rc-board-row__overflow > div { position: absolute; z-index: 90; top: 38px; right: 0; display: grid; min-width: 160px; padding: 6px; border: 1px solid #536d79; border-radius: 9px; background: #20343e; box-shadow: 0 12px 26px rgba(4, 12, 16, .38); }
+.rc-board-row__overflow > div button { display: flex !important; width: 100%; height: auto; min-height: 36px; justify-content: flex-start; gap: 8px; padding: 7px 9px; white-space: nowrap; }
 
 .rc-create-board-trigger {
   position: relative;
@@ -313,7 +406,7 @@
 
 .rc-create-board {
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto minmax(140px, 1fr) minmax(130px, auto) auto auto;
   align-items: center;
   gap: 10px;
   margin: 16px 18px;
@@ -365,6 +458,7 @@
 .rc-library__preview-header span { color: var(--rc-ink-soft); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .rc-library__preview-header strong { overflow: hidden; font-size: 18px; text-overflow: ellipsis; white-space: nowrap; }
 .rc-library__preview-canvas { display: grid; min-height: 0; flex: 1; place-items: center; padding: clamp(22px, 4vw, 58px); }
+.rc-board-thumbnail { display: block; max-width: 92%; max-height: 92%; border: 1px solid #9bb0ba; border-radius: 9px; background: white; object-fit: contain; box-shadow: 0 14px 32px rgba(28, 49, 59, .14); }
 .rc-board-cover { position: relative; display: flex; width: min(76%, 520px); min-height: 240px; flex-direction: column; justify-content: flex-end; border: 1px solid #7f96a1; border-radius: 10px; padding: 32px; background: rgba(248, 250, 249, .94); box-shadow: 0 14px 32px rgba(28, 49, 59, .14); }
 .rc-board-cover::before { position: absolute; top: 18px; right: 18px; left: 18px; height: 1px; background: #b6c6cd; content: ''; }
 .rc-board-cover .rc-logo { position: absolute; top: 28px; left: 27px; color: #6b8490; }
@@ -417,12 +511,19 @@
   letter-spacing: .08em;
 }
 
+.rc-workspace__masthead-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
 .rc-workspace__body {
   display: grid;
   height: calc(100% - 70px);
   min-height: 0;
   grid-template-columns: minmax(320px, 32%) minmax(0, 1fr);
 }
+.rc-workspace[data-library-collapsed] .rc-workspace__body { grid-template-columns: minmax(0, 1fr); }
 
 .rc-workspace__field {
   position: relative;
@@ -433,6 +534,20 @@
   background-image: linear-gradient(rgba(71, 111, 133, .09) 1px, transparent 1px), linear-gradient(90deg, rgba(71, 111, 133, .09) 1px, transparent 1px);
   background-size: 24px 24px;
 }
+.rc-workspace__library-toggle {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #9fb1ba;
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: var(--rc-paper);
+  color: var(--rc-ink-soft);
+  cursor: pointer;
+}
+.rc-workspace__library-toggle:hover { background: white; color: var(--rc-ink); }
+.rc-workspace__library-toggle span { font-size: 11px; font-weight: 700; }
 
 .rc-workspace__field::after {
   position: absolute;
@@ -594,6 +709,12 @@
 .rc-canvas-title { width: min(42vw, 440px); min-width: 0; border: 0; border-bottom: 1px solid transparent; padding: 4px 2px; background: transparent; color: var(--rc-ink); font-family: "Barlow Condensed", ui-sans-serif, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: 0; }
 .rc-canvas-title:hover { border-bottom-color: #b5c6cd; }
 .rc-canvas__header-meta { display: flex; align-items: center; gap: 18px; }
+.rc-canvas__header-actions { display: flex; align-items: center; gap: 4px; }
+.rc-canvas__header-actions > button { display: grid; width: 34px; height: 34px; place-items: center; border: 0; border-radius: 7px; background: transparent; color: var(--rc-ink-soft); cursor: pointer; }
+.rc-canvas__header-actions > button:hover { background: #e4ecef; color: var(--rc-ink); }
+.rc-export-control { position: relative; display: flex; min-height: 34px; align-items: center; gap: 5px; border-radius: 7px; padding-left: 8px; color: var(--rc-ink-soft); }
+.rc-export-control:hover { background: #e4ecef; }
+.rc-export-control select { max-width: 74px; border: 0; padding: 6px 4px 6px 0; background: transparent; color: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
 .rc-canvas__input-note { color: var(--rc-ink-soft); font-size: 11px; }
 .rc-save-status { display: flex; min-width: 92px; align-items: center; justify-content: flex-end; gap: 8px; color: var(--rc-ink-soft); font-size: 12px; font-weight: 700; white-space: nowrap; }
 .rc-save-status[data-status="saving"] .rc-status-light { background: var(--rc-orange); animation: rc-pulse 1s ease-in-out infinite; }
@@ -603,7 +724,11 @@
 @keyframes rc-pulse { 50% { transform: scale(.7); opacity: .5; } }
 
 .rc-canvas__editor { position: relative; min-height: 0; flex: 1; }
-.rc-canvas__editor > .excalidraw { position: absolute; inset: 0; }
+.rc-editor { position: relative; width: 100%; height: 100%; min-height: 0; overflow: hidden; background: var(--rc-field); }
+.rc-editor[data-fullscreen-fallback] { position: fixed; z-index: 99999; inset: 0; width: 100vw; height: 100dvh; }
+.rc-editor:fullscreen { width: 100vw; height: 100vh; }
+.rc-editor__surface { position: relative; width: 100%; height: 100%; min-height: 0; }
+.rc-editor__surface > .excalidraw { position: absolute; inset: 0; }
 .rc-canvas__editor .excalidraw {
   --ui-font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --island-bg-color: rgba(248, 250, 249, .97);
@@ -641,7 +766,7 @@
 .rc-canvas__editor .excalidraw .undo-redo-buttons { border: 1px solid #a5b6be; border-radius: 9px; background: rgba(248, 250, 249, .97); box-shadow: 0 7px 18px rgba(29, 51, 62, .12); }
 .rc-canvas__editor .excalidraw .help-icon { display: none; }
 
-.rc-canvas[data-chrome="none"] .excalidraw .layer-ui__wrapper,
+.rc-editor[data-chrome="none"] .excalidraw .layer-ui__wrapper,
 .rc-canvas[data-chrome="none"] .rc-save-recovery { display: none; }
 
 .rc-canvas-fullscreen {
@@ -713,6 +838,9 @@
 .rc-save-recovery button { display: flex; min-height: 34px; align-items: center; gap: 6px; border: 0; border-radius: 7px; padding: 7px 10px; background: #354b56; color: white; font-size: 12px; font-weight: 700; cursor: pointer; }
 .rc-save-recovery button:hover { background: #425b67; }
 
+.rc-canvas-notice { position: absolute; z-index: 590; top: 12px; right: 12px; display: flex; align-items: center; gap: 8px; max-width: min(440px, calc(100% - 24px)); border: 1px solid #9fc4e8; border-radius: 8px; padding: 8px 9px 8px 12px; background: rgba(232, 242, 250, .97); color: #174e84; box-shadow: 0 7px 18px rgba(29, 51, 62, .12); font-size: 12px; font-weight: 700; }
+.rc-canvas-notice button { border: 0; background: transparent; color: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
+
 .rc-canvas-state {
   display: grid;
   width: 100%;
@@ -761,7 +889,8 @@
   .rc-segmented-toggle { align-self: auto; }
   .rc-board-row { min-height: 76px; }
   .rc-board-row__actions { opacity: 1; }
-  .rc-board-row__actions button:not(:last-child) { display: none; }
+  .rc-board-row__actions > button { display: none; }
+  .rc-board-row__overflow { display: block; }
   .rc-create-board { grid-template-columns: 1fr 1fr; }
   .rc-create-board > svg { display: none; }
   .rc-create-board input { grid-column: 1 / -1; width: 100%; }
@@ -770,6 +899,7 @@
 
   .rc-workspace { border-radius: 0; }
   .rc-workspace__masthead { height: 58px; padding-inline: 12px; }
+  .rc-workspace__masthead-actions { margin-left: auto; }
   .rc-workspace__masthead .rc-library__tagline,
   .rc-workspace__bearing { display: none; }
   .rc-workspace__body { height: calc(100% - 58px); min-height: 0; grid-template-columns: 1fr; }
@@ -777,12 +907,14 @@
   .rc-workspace__field { padding: 0; }
   .rc-workspace__field::after,
   .rc-workspace__scale { display: none; }
+  .rc-workspace__library-toggle { display: none; }
 
   .rc-canvas { border-radius: 0; }
   .rc-canvas__header { min-height: 56px; padding: 7px 10px; }
   .rc-canvas__identity { gap: 4px; }
   .rc-canvas-title { width: min(45vw, 260px); font-size: 16px; }
   .rc-canvas__input-note { display: none; }
+  .rc-canvas__header-actions { display: none; }
   .rc-save-status { min-width: auto; font-size: 11px; }
   .rc-canvas__editor .excalidraw { --editor-container-padding: 8px; }
   .rc-canvas__editor .excalidraw .ToolIcon__icon { width: 36px; height: 36px; }
