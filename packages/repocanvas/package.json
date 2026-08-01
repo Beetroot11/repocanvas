@@ -42,7 +42,7 @@
     }
   },
   "bin": {
-    "repocanvas": "./scripts/repocanvas-cli.mjs"
+    "repocanvas": "scripts/repocanvas-cli.mjs"
   },
   "files": [
     "dist",

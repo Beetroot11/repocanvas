@@ -33,7 +33,7 @@ try {
   assert.ok(manifest.exports['./editor'])
   assert.ok(manifest.exports['./library'])
   assert.ok(manifest.exports['./testing'])
-  assert.equal(manifest.bin.repocanvas, './scripts/repocanvas-cli.mjs')
+  assert.equal(manifest.bin.repocanvas, 'scripts/repocanvas-cli.mjs')
 
   const core = await import(pathToFileURL(join(extractedRoot, 'dist', 'core.js')).href)
   assert.equal(typeof core.createEmptyDocument, 'function')
